@@ -220,7 +220,13 @@ fn paragraph_parser_opener_candidates_and_links() -> impl Parser<
                             },
                         }
                     } else {
-                        LinkTarget::Url(content.into_iter().map_into::<String>().collect())
+                        let content_str: String =
+                            content.into_iter().map_into::<String>().collect();
+                        if let Ok(line_number) = content_str.trim().parse::<usize>() {
+                            LinkTarget::LineNumber(line_number)
+                        } else {
+                            LinkTarget::Url(content_str)
+                        }
                     }]
                 } else {
                     vec![]
@@ -438,6 +444,7 @@ pub enum LinkTarget {
     Generic(Vec<ParagraphSegment>),
     Wiki(Vec<ParagraphSegment>),
     Extendable(Vec<ParagraphSegment>),
+    LineNumber(usize),
     Path(String),
     Url(String),
     Timestamp(String),
@@ -580,10 +587,7 @@ fn detached_modifier_extensions() -> impl Parser<
                 .or_not()
                 .map(|tokens| {
                     if let Some(tokens) = tokens {
-                        tokens
-                            .into_iter()
-                            .map_into::<String>()
-                            .collect()
+                        tokens.into_iter().map_into::<String>().collect()
                     } else {
                         String::from("")
                     }
