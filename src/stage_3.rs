@@ -177,6 +177,7 @@ fn paragraph_parser_opener_candidates_and_links() -> impl Parser<
                 just(ParagraphSegmentToken::Special('=')).to("=".to_string()),
                 just(ParagraphSegmentToken::Special('?')).to("?".to_string()),
                 just(ParagraphSegmentToken::Special('@')).to("@".to_string()),
+                just(ParagraphSegmentToken::Special('#')).to("#".to_string()),
             ))
             .then_ignore(
                 just(ParagraphSegmentToken::Whitespace)
@@ -206,6 +207,7 @@ fn paragraph_parser_opener_candidates_and_links() -> impl Parser<
                             "^" => LinkTarget::Footnote(parse_paragraph(content).unwrap()),
                             "?" => LinkTarget::Wiki(parse_paragraph(content).unwrap()),
                             "=" => LinkTarget::Extendable(parse_paragraph(content).unwrap()),
+                            "#" => LinkTarget::Generic(parse_paragraph(content).unwrap()),
                             "/" => {
                                 LinkTarget::Path(content.into_iter().map_into::<String>().collect())
                             }
