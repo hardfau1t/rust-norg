@@ -744,6 +744,8 @@ mod tests {
             "{:another_file:}",
             r#"{:path/to/other-file:}"#,
             r#"{:path/to/file:123}"#,
+            r#"{:$/path/from/root/file:123}"#,
+            r#"{: $workspace/path/from/root/file:123}"#,
             r#"{:path/to/file:# Generic Location within that file}"#,
             r#"{:path/to/file:** Level 2 heading}"#,
             r#"{file://my/file.norg}"#,
