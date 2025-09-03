@@ -148,6 +148,18 @@ expression: examples
           description: ~
 - - Paragraph:
       - Link:
+          filepath: $/path/from/root/file
+          targets:
+            - LineNumber: 123
+          description: ~
+- - Paragraph:
+      - Link:
+          filepath: " $workspace/path/from/root/file"
+          targets:
+            - LineNumber: 123
+          description: ~
+- - Paragraph:
+      - Link:
           filepath: path/to/file
           targets:
             - Generic:
