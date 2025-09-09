@@ -11,6 +11,6 @@ textwrap = "0.16.1"
 unicode_categories = "0.1.1"
 
 [dev-dependencies]
-insta = { version = "1.39.0", features = ["yaml"] }
+insta = { version = "1.39.0", features = ["ron", "yaml"] }
 proptest = "1.4.0"
 test-log = "0.2.18"
