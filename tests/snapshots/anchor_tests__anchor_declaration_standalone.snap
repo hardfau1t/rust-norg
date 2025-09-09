@@ -1,0 +1,52 @@
+---
+source: tests/anchor_tests.rs
+expression: result
+---
+[
+  Paragraph([
+    Token(Text("This")),
+    Token(Whitespace),
+    Token(Text("text")),
+    Token(Whitespace),
+    Token(Text("references")),
+    Token(Whitespace),
+    Anchor(
+      content: [
+        Token(Text("anchor")),
+        Token(Whitespace),
+        Token(Text("name")),
+      ],
+      description: None,
+    ),
+    Token(Whitespace),
+    Token(Text("in")),
+    Token(Whitespace),
+    Token(Text("the")),
+    Token(Whitespace),
+    Token(Text("content")),
+    Token(Special('.')),
+  ]),
+  Paragraph([
+    AnchorDefinition(
+      content: [
+        Token(Text("anchor")),
+        Token(Whitespace),
+        Token(Text("name")),
+      ],
+      target: Link(
+        filepath: None,
+        targets: [
+          Heading(
+            level: 1,
+            title: [
+              Token(Text("Target")),
+              Token(Whitespace),
+              Token(Text("Heading")),
+            ],
+          ),
+        ],
+        description: None,
+      ),
+    ),
+  ]),
+]

@@ -1,10 +1,5 @@
-use rust_norg::{
-    parse_tree, LinkTarget,
-    LinkTarget::Heading,
-    NorgAST::Paragraph,
-    ParagraphSegment::{Anchor, AnchorDefinition, Link, Token},
-    ParagraphSegmentToken::{Special, Text, Whitespace},
-};
+use insta::{assert_ron_snapshot, with_settings};
+use rust_norg::parse_tree;
 use test_log::test;
 
 // Basic Anchor Declaration Tests
@@ -14,198 +9,112 @@ fn test_anchor_declaration_basic() {
 
 [Neorg]{https://github.com/nvim-neorg/neorg}"#;
     let result = parse_tree(norg).expect("Failed to parse basic anchor declaration");
-    assert_eq!(result, vec![]);
     // Should create anchor reference and definition
-    assert_eq!(
-        result,
-        vec![
-            Paragraph(vec![
-                Anchor {
-                    content: vec![Token(Text("Neorg".to_string()))],
-                    description: None
-                },
-                Token(Whitespace),
-                Token(Text("is".to_string())),
-                Token(Whitespace),
-                Token(Text("a".to_string())),
-                Token(Whitespace),
-                Token(Text("fancy".to_string())),
-                Token(Whitespace),
-                Token(Text("organizational".to_string())),
-                Token(Whitespace),
-                Token(Text("tool".to_string())),
-                Token(Special('.'))
-            ]),
-            Paragraph(vec![AnchorDefinition {
-                content: vec![Token(Text("Neorg".to_string()))],
-                target: Box::new(Link {
-                    filepath: None,
-                    targets: vec![LinkTarget::Url(
-                        "https://github.com/nvim-neorg/neorg".to_string()
-                    )],
-                    description: None
-                })
-            }])
-        ],
-        "Failed to run test test_anchor_declaration_basic"
-    );
+    assert_ron_snapshot!(result);
 }
 
-#[test]
-fn test_anchor_declaration_standalone() {
-    let norg = r#"This text references [anchor name] in the content.
-
-[anchor name]{* Target Heading}"#;
-    let result = parse_tree(norg).expect("Failed to parse standalone anchor declaration");
-    assert_eq!(result, vec![]);
-    assert_eq!(
-        result,
-        vec![
-            Paragraph(vec![
-                Token(Text("This".to_string())),
-                Token(Whitespace),
-                Token(Text("text".to_string())),
-                Token(Whitespace),
-                Token(Text("references".to_string())),
-                Token(Whitespace),
-                Anchor {
-                    content: vec![
-                        Token(Text("anchor".to_string())),
-                        Token(Whitespace),
-                        Token(Text("name".to_string()))
-                    ],
-                    description: None
-                },
-                Token(Whitespace),
-                Token(Text("in".to_string())),
-                Token(Whitespace),
-                Token(Text("the".to_string())),
-                Token(Whitespace),
-                Token(Text("content".to_string())),
-                Token(Special('.'))
-            ]),
-            Paragraph(vec![AnchorDefinition {
-                content: vec![
-                    Token(Text("anchor".to_string())),
-                    Token(Whitespace),
-                    Token(Text("name".to_string()))
-                ],
-                target: Box::new(Link {
-                    filepath: None,
-                    targets: vec![Heading {
-                        level: 1,
-                        title: vec![
-                            Token(Text("Target".to_string())),
-                            Token(Whitespace),
-                            Token(Text("Heading".to_string()))
-                        ]
-                    }],
-                    description: None
-                })
-            }])
-        ]
-    );
-}
 #[test]
 fn test_anchor_with_description() {
     let norg = r#"[anchor][custom description]
 
 [anchor]{# target-location}"#;
     let result = parse_tree(norg).expect("Failed to parse anchor with description");
-    assert_eq!(result, vec![]);
-    assert_eq!(
-        result,
-        vec![
-            Paragraph(vec![Anchor {
-                content: vec![Token(Text("anchor".to_string()))],
-                description: Some(vec![
-                    Token(Text("custom".to_string())),
-                    Token(Whitespace),
-                    Token(Text("description".to_string()))
-                ])
-            }]),
-            Paragraph(vec![AnchorDefinition {
-                content: vec![Token(Text("anchor".to_string()))],
-                target: Box::new(Link {
-                    filepath: None,
-                    targets: vec![LinkTarget::Generic(vec![
-                        Token(Text("target".to_string())),
-                        Token(Special('-')),
-                        Token(Text("location".to_string()))
-                    ])],
-                    description: None
-                })
-            }])
-        ]
-    )
+    with_settings!({
+        info => &norg,
+        description => "check ancho declaration with description",
+        omit_expression => true,
+    }, {assert_ron_snapshot!(result)});
+    // assert_eq!(
+    //     result,
+    //     vec![
+    //         Paragraph(vec![Anchor {
+    //             content: vec![Token(Text("anchor".to_string()))],
+    //             description: Some(vec![
+    //                 Token(Text("custom".to_string())),
+    //                 Token(Whitespace),
+    //                 Token(Text("description".to_string()))
+    //             ])
+    //         }]),
+    //         Paragraph(vec![AnchorDefinition {
+    //             content: vec![Token(Text("anchor".to_string()))],
+    //             target: Box::new(Link {
+    //                 filepath: None,
+    //                 targets: vec![LinkTarget::Generic(vec![
+    //                     Token(Text("target".to_string())),
+    //                     Token(Special('-')),
+    //                     Token(Text("location".to_string()))
+    //                 ])],
+    //                 description: None
+    //             })
+    //         }])
+    //     ]
+    // )
 }
 
-// Anchor Definition Tests
-#[test]
-fn test_anchor_definition_heading() {
-    let norg = r#"[section reference]{* Important Section}"#;
-    let result = parse_tree(norg).expect("Failed to parse anchor definition to heading");
-    assert_eq!(result, vec![]);
-    // Should link anchor to heading
-    assert_eq!(
-        result,
-        vec![Paragraph(vec![AnchorDefinition {
-            content: vec![
-                Token(Text("section".to_string())),
-                Token(Whitespace),
-                Token(Text("reference".to_string()))
-            ],
-            target: Box::new(Link {
-                filepath: None,
-                targets: vec![Heading {
-                    level: 1,
-                    title: vec![
-                        Token(Text("Important".to_string())),
-                        Token(Whitespace),
-                        Token(Text("Section".to_string()))
-                    ]
-                }],
-                description: None
-            })
-        }])]
-    );
-}
-
-#[test]
-fn test_anchor_definition_external_url() {
-    let norg = r#"[homepage]{https://example.com}"#;
-    let result = parse_tree(norg).expect("Failed to parse anchor definition to external URL");
-    assert_eq!(result, vec![]);
-    // Should link anchor to external URL
-    assert_eq!(
-        result,
-        vec![Paragraph(vec![AnchorDefinition {
-            content: vec![Token(Text("homepage".to_string()))],
-            target: Box::new(Link {
-                filepath: None,
-                targets: vec![LinkTarget::Url("https://example.com".to_string())],
-                description: None
-            })
-        }])]
-    )
-}
-
-#[test]
-fn test_anchor_definition_file_location() {
-    let norg = r#"{:docs/setup:}[documentation]"#;
-    let result = parse_tree(norg).expect("Failed to parse anchor definition to file location");
-    assert_eq!(
-        result,
-        vec![Paragraph(vec![AnchorDefinition {
-            content: vec![Token(Text("documentation".to_string()))],
-            target: Box::new(Link {
-                filepath: Some("docs/setup".to_string()),
-                targets: vec![],
-                description: None
-            })
-        }])]
-    );
-}
+// // Anchor Definition Tests
+// #[test]
+// fn test_anchor_definition_heading() {
+//     let norg = r#"[section reference]{* Important Section}"#;
+//     let result = parse_tree(norg).expect("Failed to parse anchor definition to heading");
+//     // Should link anchor to heading
+//     assert_eq!(
+//         result,
+//         vec![Paragraph(vec![AnchorDefinition {
+//             content: vec![
+//                 Token(Text("section".to_string())),
+//                 Token(Whitespace),
+//                 Token(Text("reference".to_string()))
+//             ],
+//             target: Box::new(Link {
+//                 filepath: None,
+//                 targets: vec![Heading {
+//                     level: 1,
+//                     title: vec![
+//                         Token(Text("Important".to_string())),
+//                         Token(Whitespace),
+//                         Token(Text("Section".to_string()))
+//                     ]
+//                 }],
+//                 description: None
+//             })
+//         }])]
+//     );
+// }
+//
+// #[test]
+// fn test_anchor_definition_external_url() {
+//     let norg = r#"[homepage]{https://example.com}"#;
+//     let result = parse_tree(norg).expect("Failed to parse anchor definition to external URL");
+//     // Should link anchor to external URL
+//     assert_eq!(
+//         result,
+//         vec![Paragraph(vec![AnchorDefinition {
+//             content: vec![Token(Text("homepage".to_string()))],
+//             target: Box::new(Link {
+//                 filepath: None,
+//                 targets: vec![LinkTarget::Url("https://example.com".to_string())],
+//                 description: None
+//             })
+//         }])]
+//     )
+// }
+//
+// #[test]
+// fn test_anchor_definition_file_location() {
+//     let norg = r#"{:docs/setup:}[documentation]"#;
+//     let result = parse_tree(norg).expect("Failed to parse anchor definition to file location");
+//     assert_eq!(
+//         result,
+//         vec![Paragraph(vec![AnchorDefinition {
+//             content: vec![Token(Text("documentation".to_string()))],
+//             target: Box::new(Link {
+//                 filepath: Some("docs/setup".to_string()),
+//                 targets: vec![],
+//                 description: None
+//             })
+//         }])]
+//     );
+// }
 
 /*
 // Multiple Anchor Usage

@@ -1,0 +1,39 @@
+---
+source: tests/anchor_tests.rs
+expression: result
+---
+[
+  Paragraph([
+    Anchor(
+      content: [
+        Token(Text("Neorg")),
+      ],
+      description: None,
+    ),
+    Token(Whitespace),
+    Token(Text("is")),
+    Token(Whitespace),
+    Token(Text("a")),
+    Token(Whitespace),
+    Token(Text("fancy")),
+    Token(Whitespace),
+    Token(Text("organizational")),
+    Token(Whitespace),
+    Token(Text("tool")),
+    Token(Special('.')),
+  ]),
+  Paragraph([
+    AnchorDefinition(
+      content: [
+        Token(Text("Neorg")),
+      ],
+      target: Link(
+        filepath: None,
+        targets: [
+          Url("https://github.com/nvim-neorg/neorg"),
+        ],
+        description: None,
+      ),
+    ),
+  ]),
+]
