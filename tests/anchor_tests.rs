@@ -4,24 +4,29 @@ use test_log::test;
 use tracing::info;
 
 // test and description pair
-const ANCHOR_TESTS: [(&str, &str, &str); 2] = [
+const ANCHOR_TESTS: [(&str, &str, &str); 3] = [
     (
+        "test_anchor_declaration_basic",
+        "Basic Anchor Declaration Tests",
         r#"[Neorg] is a fancy organizational tool.
         [Neorg]{https://github.com/nvim-neorg/neorg}"#,
-        "Basic Anchor Declaration Tests",
-        "test_anchor_declaration_basic",
     ),
     (
-        r#"[anchor][custom description]. Here is [anchor]{# target-location}"#,
-        "check ancho declaration with description",
         "test_anchor_with_description",
+        "check ancho declaration with description",
+        r#"[anchor][custom description]. Here is [anchor]{# target-location}"#,
+    ),
+    (
+        "test_anchor_definition_heading",
+        "Should link anchor to heading",
+        r#"[section reference]{* Important Section}"#,
     ),
 ];
 
 // run  all anchor tests
 #[test]
 fn run_anchor_tests() {
-    for (norg_str, desc, name) in ANCHOR_TESTS {
+    for (name, desc, norg_str) in ANCHOR_TESTS {
         let result = parse_tree(norg_str).expect("Failed to parse basic anchor declaration");
         info!(name, desc, "running test");
         with_settings!({
@@ -35,9 +40,9 @@ fn run_anchor_tests() {
 // // Anchor Definition Tests
 // #[test]
 // fn test_anchor_definition_heading() {
-//     let norg = r#"[section reference]{* Important Section}"#;
+//     let norg = ;
 //     let result = parse_tree(norg).expect("Failed to parse anchor definition to heading");
-//     // Should link anchor to heading
+//     //
 //     assert_eq!(
 //         result,
 //         vec![Paragraph(vec![AnchorDefinition {
