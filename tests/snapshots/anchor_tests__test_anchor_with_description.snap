@@ -1,7 +1,7 @@
 ---
 source: tests/anchor_tests.rs
 description: check ancho declaration with description
-info: "[anchor][custom description]\n\n[anchor]{# target-location}"
+info: "[anchor][custom description]. Here is [anchor]{# target-location}"
 ---
 [
   Paragraph([
@@ -15,8 +15,12 @@ info: "[anchor][custom description]\n\n[anchor]{# target-location}"
         Token(Text("description")),
       ]),
     ),
-  ]),
-  Paragraph([
+    Token(Special('.')),
+    Token(Whitespace),
+    Token(Text("Here")),
+    Token(Whitespace),
+    Token(Text("is")),
+    Token(Whitespace),
     AnchorDefinition(
       content: [
         Token(Text("anchor")),

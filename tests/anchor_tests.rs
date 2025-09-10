@@ -1,54 +1,35 @@
 use insta::{assert_ron_snapshot, with_settings};
 use rust_norg::parse_tree;
 use test_log::test;
+use tracing::info;
 
-// Basic Anchor Declaration Tests
+// test and description pair
+const ANCHOR_TESTS: [(&str, &str, &str); 2] = [
+    (
+        r#"[Neorg] is a fancy organizational tool.
+        [Neorg]{https://github.com/nvim-neorg/neorg}"#,
+        "Basic Anchor Declaration Tests",
+        "test_anchor_declaration_basic",
+    ),
+    (
+        r#"[anchor][custom description]. Here is [anchor]{# target-location}"#,
+        "check ancho declaration with description",
+        "test_anchor_with_description",
+    ),
+];
+
+// run  all anchor tests
 #[test]
-fn test_anchor_declaration_basic() {
-    let norg = r#"[Neorg] is a fancy organizational tool.
-
-[Neorg]{https://github.com/nvim-neorg/neorg}"#;
-    let result = parse_tree(norg).expect("Failed to parse basic anchor declaration");
-    // Should create anchor reference and definition
-    assert_ron_snapshot!(result);
-}
-
-#[test]
-fn test_anchor_with_description() {
-    let norg = r#"[anchor][custom description]
-
-[anchor]{# target-location}"#;
-    let result = parse_tree(norg).expect("Failed to parse anchor with description");
-    with_settings!({
-        info => &norg,
-        description => "check ancho declaration with description",
+fn run_anchor_tests() {
+    for (norg_str, desc, name) in ANCHOR_TESTS {
+        let result = parse_tree(norg_str).expect("Failed to parse basic anchor declaration");
+        info!(name, desc, "running test");
+        with_settings!({
+        info => &norg_str,
+        description => desc,
         omit_expression => true,
-    }, {assert_ron_snapshot!(result)});
-    // assert_eq!(
-    //     result,
-    //     vec![
-    //         Paragraph(vec![Anchor {
-    //             content: vec![Token(Text("anchor".to_string()))],
-    //             description: Some(vec![
-    //                 Token(Text("custom".to_string())),
-    //                 Token(Whitespace),
-    //                 Token(Text("description".to_string()))
-    //             ])
-    //         }]),
-    //         Paragraph(vec![AnchorDefinition {
-    //             content: vec![Token(Text("anchor".to_string()))],
-    //             target: Box::new(Link {
-    //                 filepath: None,
-    //                 targets: vec![LinkTarget::Generic(vec![
-    //                     Token(Text("target".to_string())),
-    //                     Token(Special('-')),
-    //                     Token(Text("location".to_string()))
-    //                 ])],
-    //                 description: None
-    //             })
-    //         }])
-    //     ]
-    // )
+    }, {assert_ron_snapshot!(name, result)});
+    }
 }
 
 // // Anchor Definition Tests
