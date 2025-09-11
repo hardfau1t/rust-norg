@@ -1,36 +1,18 @@
 ---
 source: tests/anchor_tests.rs
-description: Basic Anchor Declaration Tests
-info: "[Neorg] is a fancy organizational tool.\n        [Neorg]{https://github.com/nvim-neorg/neorg}"
+description: Should link anchor to external URL
+info: "[homepage]{https://example.com}"
 ---
 [
   Paragraph([
-    Anchor(
-      content: [
-        Token(Text("Neorg")),
-      ],
-      description: None,
-    ),
-    Token(Whitespace),
-    Token(Text("is")),
-    Token(Whitespace),
-    Token(Text("a")),
-    Token(Whitespace),
-    Token(Text("fancy")),
-    Token(Whitespace),
-    Token(Text("organizational")),
-    Token(Whitespace),
-    Token(Text("tool")),
-    Token(Special('.')),
-    Token(Whitespace),
     AnchorDefinition(
       content: [
-        Token(Text("Neorg")),
+        Token(Text("homepage")),
       ],
       target: Link(
         filepath: None,
         targets: [
-          Url("https://github.com/nvim-neorg/neorg"),
+          Url("https://example.com"),
         ],
         description: None,
       ),
